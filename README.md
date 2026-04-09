@@ -1,6 +1,6 @@
 # 🎵 Spotify Overlay
 
-Overlay elegante en tiempo real que muestra la canción que estás escuchando en Spotify. Perfecto para streamers y creadores de contenido.
+Overlay en tiempo real que muestra la canción que estás escuchando en Spotify. Perfecto para streamers y creadores de contenido.
 
 ![Node](https://img.shields.io/badge/node-16%2B-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -11,9 +11,9 @@ Overlay elegante en tiempo real que muestra la canción que estás escuchando en
 
 ### Requisitos Previos
 
-- Node.js 16+
+- Node.js 24.14+ [Node.js](https://nodejs.org))
 - npm
-- Cuenta de Spotify (para funcionar en la nuve tiene que ser premium)
+- Cuenta de Spotify
 - App registrada en [Spotify Developer](https://developer.spotify.com/dashboard)
 
 ### Pasos
