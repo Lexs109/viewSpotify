@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700,900&display=swap');
+
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            margin: 0; padding: 0;
+            background: transparent;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+        }
+
+        .wrapper {
+            width: 600px; height: 250px;
+            display: flex; align-items: flex-start;
+            padding-top: 50px; padding-left: 70px;
+        }
+
+        .player-bar {
+            width: 450px; height: 100px;
+            position: relative;
+            background: rgba(10, 10, 10, 0.7);
+            border-radius: 15px;
+            display: flex; align-items: center;
+            box-shadow: 10px 10px 25px rgba(0,0,0,0.6);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .bg-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 15px; overflow: hidden; z-index: 1;
+        }
+
+        #bg-blur {
+            width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            filter: blur(8px) brightness(0.6);
+            position: absolute;
+            transition: background-image 0.5s ease;
+        }
+
+        .content {
+            position: relative; z-index: 2;
+            display: flex; align-items: center;
+            width: 100%; height: 100%;
+        }
+
+        .disk-box {
+            width: 120px; height: 120px;
+            position: absolute; left: 8px; top: 68%;
+            transform: translateY(-50%);
+            filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.8));
+            z-index: 3;
+        }
+
+        #cover {
+            width: 100%; height: 100%;
+            object-fit: cover; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.2);
+            animation: spin 12s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .info {
+            margin-left: 135px; width: calc(100% - 150px);
+            overflow: hidden; padding-right: 15px;
+        }
+
+        #artist {
+            font-size: 22px; font-weight: 700;
+            color: #eee; text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            white-space: nowrap; 
+            display: inline-block;
+            transition: color 0.5s ease;
+        }
+
+        .title-container {
+            width: 100%; overflow: hidden; white-space: nowrap;
+            position: relative;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        #title-scroll {
+            display: inline-block;
+            font-weight: 900; color: white;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            padding-left: 0;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-105%); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="player-bar" id="player">
+        <div class="bg-layer"><div id="bg-blur"></div></div>
+        <div class="content">
+            <div class="disk-box"><img id="cover" src="" alt=""></div>
+            <div class="info">
+                <div id="artist">Cargando...</div>
+                <div class="title-container">
+                    <div id="title-scroll">Spotify Overlay</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let lastSong = "";
+    const player = document.getElementById("player");
+    const scrollEl = document.getElementById("title-scroll");
+
+    async function updateSong() {
+        try {
+            const res = await fetch("/song");
+            const data = await res.json();
+
+            if (!data.playing) {
+                player.style.opacity = "0";
+                return;
+            }
+
+            player.style.opacity = "1";
+
+            if (lastSong !== data.title) {
+                lastSong = data.title;
+
+                // --- 1. DATOS BÁSICOS ---
+                const artistEl = document.getElementById("artist");
+                const firstArtist = data.artist.split(",")[0].trim();
+                artistEl.innerText = firstArtist;
+                artistEl.style.color = data.artistColor;
+
+                document.getElementById("cover").src = data.cover;
+                document.getElementById("bg-blur").style.backgroundImage = `url(${data.cover})`;
+
+                scrollEl.innerText = data.title;
+                const titleLength = data.title.length;
+
+                // --- 2. TAMAÑO DE FUENTE DINÁMICO ---
+                if (titleLength < 15) {
+                    scrollEl.style.fontSize = "38px";
+                } else if (titleLength < 25) {
+                    scrollEl.style.fontSize = "30px";
+                } else {
+                    scrollEl.style.fontSize = "24px";
+                }
+
+                // --- 3. CÁLCULO DE TIEMPOS (Título) ---
+                const scrollDuration = Math.max(8, titleLength * 0.25);
+                const pauseDuration = 0.5;
+                const totalDuration = scrollDuration + pauseDuration;
+                const scrollPercentage = (scrollDuration / totalDuration) * 100;
+
+                // --- 4. CREAR/ACTUALIZAR KEYFRAMES ---
+                const styleId = 'marquee-dynamic-style';
+                let styleEl = document.getElementById(styleId);
+                if (!styleEl) {
+                    styleEl = document.createElement('style');
+                    styleEl.id = styleId;
+                    document.head.appendChild(styleEl);
+                }
+
+                styleEl.textContent = `
+                    @keyframes marquee-dynamic {
+                        0% { transform: translateX(350px); }
+                        ${scrollPercentage}% { transform: translateX(-105%); }
+                        100% { transform: translateX(-105%); }
+                    }
+                `;
+
+                // --- 5. APLICAR ANIMACIÓN AL TÍTULO ---
+                scrollEl.style.animation = "none";
+                scrollEl.offsetHeight; 
+                scrollEl.style.animation = `marquee-dynamic ${totalDuration}s linear infinite`;
+
+                // --- 6. APLICAR ANIMACIÓN AL ARTISTA (Solo si no cabe) ---
+                const artistContainerWidth = artistEl.parentElement.offsetWidth;
+                const artistTextWidth = artistEl.scrollWidth;
+
+                artistEl.style.animation = "none"; // Reset previo
+                if (artistTextWidth > artistContainerWidth) {
+                    // Velocidad de las letras del artis
+                    const artistTotalDuration = totalDuration * 0.8; 
+                    artistEl.offsetHeight;
+                    artistEl.style.animation = `marquee-dynamic ${artistTotalDuration}s linear infinite`;
+                }
+            }
+        } catch (err) {
+            console.error("Error en el overlay:", err);
+        }
+    }
+
+    // Intervalo seguro de 3seg para actualizar baner canción
+    setInterval(updateSong, 3000);
+    updateSong();
+</script>
+</body>
+</html>
