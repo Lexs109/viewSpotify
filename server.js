@@ -49,8 +49,18 @@ app.get("/", (req, res) => {
     res.sendFile(process.cwd() + "/public/index.html");
 });
 
-app.get("/overlay", (req, res) => {
-    res.sendFile(process.cwd() + "/public/overlay.html");
+app.get("/overlay/:id", (req, res) => {
+    const id = req.params.id;
+    const file = process.cwd() + `/public/overlay${id}.html`;
+    if (fs.existsSync(file)) {
+        res.sendFile(file);
+    } else {
+        res.status(404).send("Overlay no encontrado");
+    }
+});
+
+app.get("/overlays", (req, res) => {
+    res.sendFile(process.cwd() + "/public/overlays.html");
 });
 
 app.get("/login", (req, res) => {
@@ -142,7 +152,7 @@ app.get("/callback", async (req, res) => {
                     <p class="info" style="color: #ffb142;">⚠️ Si estás configurando en la nube, guarda este token en tus variables de entorno como <code>REFRESH_TOKEN</code>.</p>
 
                     <div class="btn-group">
-                        <a href="${baseUrl}/overlay" class="btn">Ir al Overlay</a>
+                        <a href="${baseUrl}/overlays" class="btn">Ir al Overlay</a>
                         <a href="${baseUrl}/" class="btn btn-copy">Volver al Inicio</a>
                     </div>
                 </div>
@@ -257,6 +267,8 @@ app.get("/song", async (req, res) => {
             artist: data.item.artists.map(a => a.name).join(", "),
             cover: coverUrl,
             artistColor,
+            progress_ms: data.progress_ms,
+            duration_ms: data.item.duration_ms,
         };
         lastSongFetch = Date.now();
         res.json(songCache);

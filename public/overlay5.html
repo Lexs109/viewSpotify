@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700&display=swap');
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+
+        .wrapper {
+            width: 600px; height: 250px;
+            display: flex; align-items: flex-end;
+            padding-bottom: 20px; padding-left: 20px;
+        }
+
+        .cassette {
+            width: 460px; height: 110px;
+            background: #1a1a2e;
+            border-radius: 8px;
+            border: 2px solid #e94560;
+            box-shadow: 0 0 0 1px #e9456040, 4px 4px 0 #e94560, 8px 8px 0 #e9456030;
+            position: relative;
+            display: flex; align-items: center;
+            padding: 10px 14px;
+            gap: 14px;
+            opacity: 0;
+            transition: opacity 0.6s;
+        }
+
+        .reel {
+            width: 60px; height: 60px; flex-shrink: 0;
+            border-radius: 50%;
+            border: 3px solid #e94560;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            animation: reelSpin 3s linear infinite;
+            box-shadow: 0 0 10px #e9456060;
+        }
+        .reel::before {
+            content: '';
+            position: absolute; inset: 6px;
+            border-radius: 50%;
+            border: 2px dashed #e9456080;
+        }
+        .reel-center {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: #e94560;
+        }
+        @keyframes reelSpin { to { transform: rotate(360deg); } }
+
+        .cover-reel {
+            width: 60px; height: 60px; flex-shrink: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #e94560;
+            animation: reelSpin 3s linear infinite;
+            box-shadow: 0 0 10px #e9456060;
+        }
+        #cover { width: 100%; height: 100%; object-fit: cover; }
+
+        .info { flex: 1; overflow: hidden; }
+
+        .label {
+            font-family: 'VT323', monospace;
+            font-size: 10px; color: #e94560;
+            letter-spacing: 4px; margin-bottom: 4px;
+            text-shadow: 0 0 6px #e94560;
+        }
+
+        #artist {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 3px;
+            white-space: nowrap; overflow: visible; text-overflow: ellipsis;
+            transition: color 0.5s;
+        }
+
+        #title {
+            font-family: 'VT323', monospace;
+            font-size: 24px; color: white;
+            text-transform: uppercase; letter-spacing: 1px;
+            white-space: nowrap; overflow: visible; text-overflow: ellipsis;
+            text-shadow: 2px 2px 0 #e9456040;
+            margin-bottom: 8px;
+        }
+
+        .progress-wrap {
+            width: 100%; height: 4px;
+            background: rgba(233,69,96,0.2);
+            border-radius: 2px; overflow: hidden;
+            border: 1px solid #e9456040;
+        }
+        
+        #progress-bar {
+            height: 100%; width: 0%;
+            background: #e94560;
+            transition: width 1s linear;
+            box-shadow: 0 0 6px #e94560;
+        }
+
+        .time-row {
+            display: flex; justify-content: space-between;
+            font-family: 'VT323', monospace;
+            font-size: 14px; color: #e9456080;
+            margin-top: 3px;
+        }
+
+        .corner-decor {
+            position: absolute;
+            width: 8px; height: 8px;
+            border-color: #e94560;
+            border-style: solid;
+        }
+        .tl { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
+        .tr { top: 4px; right: 4px; border-width: 2px 2px 0 0; }
+        .bl { bottom: 4px; left: 4px; border-width: 0 0 2px 2px; }
+        .br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+
+        .scanlines {
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            border-radius: 6px; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="cassette" id="player">
+        <div class="corner-decor tl"></div>
+        <div class="corner-decor tr"></div>
+        <div class="corner-decor bl"></div>
+        <div class="corner-decor br"></div>
+        <div class="scanlines"></div>
+
+        <div class="cover-reel"><img id="cover" src="" alt=""></div>
+        <div class="reel"><div class="reel-center"></div></div>
+
+        <div class="info">
+            <div class="label">▶ NOW PLAYING ◀</div>
+            <div id="artist">Artista</div>
+            <div id="title">Título de la canción</div>
+            <div class="progress-wrap"><div id="progress-bar"></div></div>
+            <div class="time-row">
+                <span id="time-current">0:00</span>
+                <span id="time-total">0:00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/overlay.js"></script>
+
+</body>
+</html>

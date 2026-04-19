@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Overlays - Preview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0d0d0d; color: white; font-family: 'Roboto', sans-serif; padding: 40px 30px; }
+
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #1DB954; }
+        .subtitle { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 40px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: 40px; }
+
+        .overlay-card {
+            background: #181818;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #282828;
+        }
+
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #282828;
+        }
+
+        .card-title { font-size: 14px; font-weight: 700; }
+        .card-badge {
+            font-size: 10px; letter-spacing: 2px;
+            padding: 3px 10px; border-radius: 20px;
+            background: rgba(29,185,84,0.15); color: #1DB954;
+        }
+
+        .preview-area {
+            background: #111;
+            min-height: 260px;
+            position: relative;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .preview-area iframe {
+            width: 100%; height: 350px;
+            border: none;
+            background: transparent;
+        }
+
+        .card-footer {
+            padding: 14px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-top: 1px solid #282828;
+        }
+
+        .url-display {
+            font-size: 12px; color: rgba(255,255,255,0.4);
+            font-family: monospace;
+        }
+
+        .copy-btn {
+            background: #1DB954; color: black;
+            border: none; border-radius: 8px;
+            padding: 6px 16px; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: 0.2s;
+        }
+        .copy-btn:hover { background: #1ed760; }
+        .copy-btn.copied { background: #282828; color: #1DB954; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Spotify Overlays</h1>
+    <p class="subtitle">Copia el link de tu overlay favorito y agrégalo en OBS como Browser Source (600x250 o 220x320 para el vertical)</p>
+
+    <div class="grid" id="grid"></div>
+
+    <script>
+        const overlays = [
+            { id: 1, name: "Predeterminado", badge: "PREDETERMINADO", path: "/overlay/1" },
+            { id: 1.5, name: "Predeterminado + Barra de progreso", badge: "PREDETERMINADO+", path: "/overlay/1.2" },
+            { id: 2, name: "Minimalista", badge: "MINIMAL", path: "/overlay/2" },
+            { id: 3, name: "Neón / Cyberpunk", badge: "CYBERPUNK", path: "/overlay/3" },
+            { id: 4, name: "Tarjeta Vertical", badge: "VERTICAL", path: "/overlay/4" },
+            { id: 5, name: "Retro Cassette", badge: "RETRO", path: "/overlay/5" },
+            { id: 6, name: "Glassmorphism", badge: "GLASS", path: "/overlay/6" },
+            { id: 7, name: "Espectro de Audio", badge: "ESPECTRO", path: "/overlay/7" },
+            { id: 8, name: "Espectro de Audio", badge: "ESPECTRO", path: "/overlay/8" }
+        ];
+
+        const grid = document.getElementById("grid");
+        const base = window.location.origin;
+
+        overlays.forEach(o => {
+            const fullUrl = base + o.path;
+            grid.innerHTML += `
+                <div class="overlay-card">
+                    <div class="card-header">
+                        <span class="card-title">${o.id}. ${o.name}</span>
+                        <span class="card-badge">${o.badge}</span>
+                    </div>
+                    <div class="preview-area">
+                        <iframe src="${o.path}" scrolling="no" allowtransparency="true"></iframe>
+                    </div>
+                    <div class="card-footer">
+                        <span class="url-display">${fullUrl}</span>
+                        <button class="copy-btn" onclick="copyUrl('${fullUrl}', this)">Copiar Link</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        function copyUrl(url, btn) {
+            navigator.clipboard.writeText(url).then(() => {
+                btn.innerText = "¡Copiado!";
+                btn.classList.add("copied");
+                setTimeout(() => { btn.innerText = "Copiar Link"; btn.classList.remove("copied"); }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.wrapper {
+    width: 600px; 
+    height: 250px;
+    display: flex; 
+    align-items: flex-end; 
+    padding: 20px;
+    background: transparent;
+}
+
+.player {
+    width: 500px;
+    height: 110px;
+    display: flex;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+}
+
+.left {
+    flex: 1;
+    background: rgba(8, 8, 12, 0.95);
+    border-radius: 14px 0 0 14px;
+    padding: 15px 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-right: none;
+    overflow: hidden;
+}
+
+.waveform {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 35px;
+    margin-bottom: 8px;
+}
+
+.bar {
+    flex: 1;
+    border-radius: 4px;
+    background: var(--artist-color, #1DB954);
+    opacity: 0.8;
+    animation: wave var(--dur) ease-in-out infinite alternate;
+    transform-origin: bottom;
+}
+
+@keyframes wave {
+    0% { height: var(--min-h); opacity: 0.4; }
+    100% { height: var(--max-h); opacity: 0.9; }
+}
+
+/* CONTENEDOR */
+.track-info-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* MARQUEE CONTINUO */
+.marquee {
+    display: flex;
+    width: max-content;
+    animation-name: scrollLeft;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/* BLOQUES DUPLICADOS */
+.marquee-content {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    margin-right: 80px;
+}
+
+/* TEXTO */
+.title {
+    font-family: 'DM Sans', sans-serif;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.separator {
+    margin: 0 10px;
+    color: white;
+    opacity: 0.6;
+}
+
+.artist {
+    font-family: 'DM Mono', monospace;
+    color: var(--artist-color, #1DB954);
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+/* ANIMACIÓN BASE */
+@keyframes scrollLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.right {
+    width: 110px;
+    overflow: hidden;
+    border-radius: 0 14px 14px 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: none;
+}
+
+#cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="player" id="player">
+        <div class="left">
+            <div class="waveform" id="waveform"></div>
+
+            <div class="track-info-container">
+                <div class="marquee" id="marquee">
+                    <div class="marquee-content">
+                        <span class="title" id="title"></span>
+                        <span class="separator">—</span>
+                        <span class="artist" id="artist"></span>
+                    </div>
+
+                    <div class="marquee-content">
+                        <span class="title" id="title2"></span>
+                        <span class="separator">—</span>
+                        <span class="artist" id="artist2"></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="right">
+            <img id="cover" src="" alt="">
+        </div>
+    </div>
+</div>
+
+<script>
+const waveform = document.getElementById("waveform");
+
+// barras
+for (let i = 0; i < 50; i++) {
+    const bar = document.createElement("div");
+    bar.className = "bar";
+    bar.style.setProperty('--max-h', (Math.floor(Math.random() * 20) + 15) + 'px');
+    bar.style.setProperty('--min-h', (Math.floor(Math.random() * 6) + 4) + 'px');
+    bar.style.setProperty('--dur', (0.6 + Math.random() * 0.8) + 's');
+    waveform.appendChild(bar);
+}
+
+/* DUPLICAR TEXTO SIN ROMPER overlay.js */
+function syncText() {
+    const t = document.getElementById("title");
+    const a = document.getElementById("artist");
+
+    const t2 = document.getElementById("title2");
+    const a2 = document.getElementById("artist2");
+
+    if (t && t2) t2.textContent = t.textContent;
+    if (a && a2) a2.textContent = a.textContent;
+}
+
+/* VELOCIDAD DINÁMICA (igual filosofía que tu JS original) */
+function updateSpeed() {
+    const marquee = document.getElementById("marquee");
+    const content = marquee.querySelector(".marquee-content");
+
+    if (!marquee || !content) return;
+
+    const width = content.scrollWidth;
+
+    const speed = 60; // px/s (ajústalo si quieres)
+    const duration = width / speed;
+
+    marquee.style.animationDuration = duration + "s";
+}
+
+setInterval(() => {
+    syncText();
+    updateSpeed();
+}, 1000);
+</script>
+
+<script src="/overlay.js"></script>
+
+</body>
+</html>

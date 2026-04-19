@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700,900&display=swap');
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: transparent; font-family: 'Roboto', sans-serif; overflow: hidden; }
+
+        .wrapper {
+            width: 600px; height: 250px;
+            display: flex; align-items: flex-end;
+            padding-bottom: 25px; padding-left: 25px;
+        }
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            pointer-events: none;
+            transition: background 1s ease;
+        }
+        .blob1 { width: 250px; height: 250px; bottom: -60px; left: -40px; }
+        .blob2 { width: 200px; height: 200px; bottom: 20px; left: 150px; background: rgba(100,100,255,0.4); }
+
+        .player {
+            width: 420px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 14px 16px 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .top-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+        .cover-wrap {
+            width: 58px; height: 58px; flex-shrink: 0;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        #cover { width: 100%; height: 100%; object-fit: cover; animation: spin 12s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .text { flex: 1; overflow: hidden; }
+
+        #artist {
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 3px;
+            margin-bottom: 4px;
+            white-space: nowrap; overflow: visible; text-overflow: ellipsis;
+            transition: color 0.5s;
+        }
+
+        #title {
+            font-size: 19px; font-weight: 900; color: white;
+            white-space: nowrap; overflow: visible; text-overflow: ellipsis;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .progress-wrap {
+            width: 100%; height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px; overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%; width: 0%;
+            transition: width 1s linear;
+            border-radius: 4px;
+            position: relative;
+        }
+        #progress-bar::after {
+            content: '';
+            position: absolute; right: -1px; top: -3px;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 6px rgba(255,255,255,0.8);
+        }
+
+        .time-row {
+            display: flex; justify-content: space-between;
+            font-size: 10px; color: rgba(255,255,255,0.4);
+            margin-top: 5px; font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+<div class="blob blob1" id="blob1"></div>
+<div class="blob blob2" id="blob2"></div>
+<div class="wrapper">
+    <div class="player" id="player">
+        <div class="top-row">
+            <div class="cover-wrap"><img id="cover" src="" alt=""></div>
+            <div class="text">
+                <div id="artist">Artista</div>
+                <div id="title">Título de la canción</div>
+            </div>
+        </div>
+        <div class="progress-wrap"><div id="progress-bar"></div></div>
+        <div class="time-row">
+            <span id="time-current">0:00</span>
+            <span id="time-total">0:00</span>
+        </div>
+    </div>
+</div>
+
+<script src="/overlay.js"></script>
+
+</body>
+</html>

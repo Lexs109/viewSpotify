@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Fuentes Pop Art */
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&display=swap');
+
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            margin: 0; padding: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .wrapper {
+            width: 550px; height: 250px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0;
+        }
+
+        /* Misma clase de tu overlay1, pero con estilo cómic */
+        .player-bar {
+            width: 480px; height: 120px;
+            position: relative;
+            background: #ffffff;
+            border: 6px solid #000000;
+            box-shadow: 12px 12px 0px #000000;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            transform: rotate(-2deg); /* Inclinación Pop Art */
+        }
+
+        /* Nuevo elemento: La etiqueta amarilla tipo cómic */
+        .badge {
+            position: absolute;
+            top: -25px; left: -15px;
+            background: #ffff00;
+            border: 4px solid #000;
+            padding: 5px 15px;
+            font-family: 'Bangers', cursive;
+            font-size: 18px;
+            transform: rotate(5deg);
+            z-index: 10;
+            color: #000;
+            letter-spacing: 1px;
+        }
+
+        /* Usamos exactamente el contenedor 'content' de tu overlay1 */
+        .content {
+            position: relative; z-index: 2;
+            display: flex; align-items: center;
+            width: 100%; height: 100%;
+            padding: 10px;
+        }
+
+        .disk-box {
+            width: 90px; height: 90px;
+            position: absolute; left: 10px; top: 50%;
+            transform: translateY(-50%);
+            border: 4px solid #000;
+            background: #000;
+            z-index: 3;
+        }
+
+        #cover {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+        }
+
+        /* El ancho exacto (calc) para que tu función applyMarquee funcione bien */
+        .info {
+            margin-left: 110px; width: calc(100% - 110px);
+            overflow: hidden; padding-right: 10px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+
+        #artist {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 18px;
+            color: #ff0055;
+            text-transform: uppercase;
+            margin-bottom: 0px;
+        }
+
+        .title-container {
+            width: 100%; overflow: hidden; white-space: nowrap;
+            position: relative;
+        }
+
+        #title-scroll {
+            font-family: 'Bangers', cursive;
+            font-size: 32px;
+            color: #000;
+            display: inline-block;
+            padding-left: 0;
+            line-height: 1.1;
+        }
+
+        /* Tu script ya actualiza #progress-bar automáticamente si existe */
+        .progress-wrap {
+            width: 100%; height: 12px;
+            background: #eee;
+            border: 3px solid #000;
+            margin-top: 5px;
+            position: relative;
+        }
+
+        #progress-bar {
+            height: 100%; width: 0%;
+            background: #00f0ff;
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="player-bar" id="player">
+        
+        <div class="badge">NOW PLAYING</div>
+        
+        <div class="content">
+            <div class="disk-box"><img id="cover" src="" alt=""></div>
+            
+            <div class="info">
+                <div id="artist">Cargando...</div>
+                
+                <div class="title-container">
+                    <div id="title-scroll">Esperando música...</div>
+                </div>
+                
+                <div class="progress-wrap">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="/overlay.js"></script>
+
+</body>
+</html>

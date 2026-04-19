@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700,900&display=swap');
+
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            margin: 0; padding: 0;
+            background: transparent;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+        }
+
+        .wrapper {
+            width: 500px; height: 250px;
+            display: flex; align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .player-bar {
+            width: 450px; height: 100px;
+            position: relative;
+            background: rgba(10, 10, 10, 0.7);
+            border-radius: 15px;
+            display: flex; align-items: center;
+            box-shadow: 10px 10px 25px rgba(0,0,0,0.6);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .bg-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 15px; overflow: hidden; z-index: 1;
+        }
+
+        #bg-blur {
+            width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            filter: blur(8px) brightness(0.6);
+            position: absolute;
+            transition: background-image 0.5s ease;
+        }
+
+        .content {
+            position: relative; z-index: 2;
+            display: flex; align-items: center;
+            width: 100%; height: 100%;
+        }
+
+        .disk-box {
+            width: 120px; height: 120px;
+            position: absolute; left: 8px; top: 68%;
+            transform: translateY(-50%);
+            filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.8));
+            z-index: 3;
+        }
+
+        #cover {
+            width: 100%; height: 100%;
+            object-fit: cover; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.2);
+            animation: spin 12s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .info {
+            margin-left: 150px; width: calc(100% - 150px);
+            overflow: hidden; padding-right: 15px; padding-bottom: 16px;
+        }
+
+        #artist {
+            font-size: 22px; font-weight: 700;
+            color: #eee; text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            white-space: nowrap; 
+            display: inline-block;
+            transition: color 0.5s ease;
+        }
+
+        .title-container {
+            width: 100%; overflow: hidden; white-space: nowrap;
+            position: relative;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        #title-scroll {
+            display: inline-block;
+            font-weight: 900; color: white;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            padding-left: 0;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-105%); }
+        }
+
+        /* Barra de progreso */
+        .progress-wrap {
+            position: absolute;
+            bottom: 0; 
+            left: 135px; /* ← empieza después del disco */
+            right: 12px;
+            width: auto; /* ← cambia de 100% a auto */
+            height: 3px;
+            background: rgba(255,255,255,0.15);
+            z-index: 4;
+            border-radius: 0 0 15px 0;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%; width: 0%;
+            transition: width 1s linear;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .time-labels {
+            position: absolute;
+            bottom: 6px; left: 135px; right: 15px;
+            display: flex; justify-content: space-between;
+            font-size: 9px; color: rgba(255,255,255,0.5);
+            z-index: 4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="player-bar" id="player">
+        <div class="bg-layer"><div id="bg-blur"></div></div>
+        <div class="content">
+            <div class="disk-box"><img id="cover" src="" alt=""></div>
+            <div class="info">
+                <div id="artist">Cargando...</div>
+                <div class="title-container">
+                    <div id="title-scroll">Spotify Overlay</div>
+                </div>
+            </div>
+        </div>
+        <div class="time-labels">
+            <span id="time-current">0:00</span>
+            <span id="time-total">0:00</span>
+        </div>
+        <div class="progress-wrap">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/overlay.js"></script>
+
+</body>
+</html>
