@@ -18,6 +18,13 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 // ── Base de datos SQLite ──────────────────────────────────
 // En Railway usa /data (Volume persistente), en local usa la raíz del proyecto
 const DB_PATH = process.env.RAILWAY_ENVIRONMENT ? "/data/database.db" : "./database.db";
+if (process.env.RAILWAY_ENVIRONMENT) {
+    const dir = "/data";
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log("📁 Carpeta /data creada en Railway");
+    }
+}
 const db = new Database(DB_PATH);
 
 // Tabla actualizada con 'spotify_id' único
