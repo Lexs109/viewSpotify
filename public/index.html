@@ -2,21 +2,365 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Spotify Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Spotify OBS Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #181818; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #282828; }
-        h1 { color: #1DB954; }
-        .button { display: block; background: #1DB954; color: black; padding: 15px 25px; margin: 15px 0; border-radius: 30px; text-decoration: none; font-weight: bold; }
-        .button:hover { background: #1ed760; }
-        code { background: #000; padding: 5px; color: #ff4757; }
+        :root {
+            --green: #1DB954;
+            --bg: #080808;
+            --surface: #111;
+            --border: #1e1e1e;
+            --text: #f0f0f0;
+            --muted: #555;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 60%, rgba(29,185,84,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 20% 20%, rgba(29,185,84,0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 24px;
+            max-width: 520px;
+            width: 100%;
+            animation: fadeUp 0.7s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ícono animado */
+        .icon-wrap {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 32px;
+        }
+        .icon-ring {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 1px solid rgba(29,185,84,0.2);
+            animation: pulse-ring 2.5s ease-in-out infinite;
+        }
+        .icon-ring:nth-child(2) {
+            inset: -20px;
+            border-color: rgba(29,185,84,0.1);
+            animation-delay: 0.5s;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.5; }
+        }
+        .icon-circle {
+            width: 80px; height: 80px;
+            background: var(--green);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            box-shadow: 0 0 40px rgba(29,185,84,0.3);
+        }
+        .eq {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 28px;
+        }
+        .eq-bar {
+            width: 5px;
+            background: #000;
+            border-radius: 3px 3px 0 0;
+            animation: eq-anim 0.8s ease-in-out infinite alternate;
+        }
+        .eq-bar:nth-child(1) { height: 40%; animation-duration: 0.7s; }
+        .eq-bar:nth-child(2) { height: 90%; animation-duration: 0.9s; animation-delay: 0.1s; }
+        .eq-bar:nth-child(3) { height: 60%; animation-duration: 0.6s; animation-delay: 0.2s; }
+        .eq-bar:nth-child(4) { height: 80%; animation-duration: 1s;   animation-delay: 0.05s; }
+        @keyframes eq-anim {
+            from { transform: scaleY(0.3); }
+            to   { transform: scaleY(1); }
+        }
+
+        h1 {
+            font-size: clamp(28px, 6vw, 40px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+        }
+        h1 span { color: var(--green); }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .feature {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .feature-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+
+        /* Botones */
+        .btn-login {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--green);
+            color: #000;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 0 0 0 rgba(29,185,84,0.4);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+        }
+        .btn-login:hover {
+            background: #1ed760;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(29,185,84,0.35);
+        }
+        .btn-login:active { transform: translateY(0); }
+
+        .btn-icon {
+            width: 20px; height: 20px;
+            background: #000;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        /* Sección "ya tengo UUID" */
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 8px 0 20px;
+            color: #333; font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1;
+            border-top: 1px solid #1e1e1e;
+        }
+
+        .uuid-section { width: 100%; }
+        .uuid-input-row {
+            display: flex; gap: 8px;
+        }
+        .uuid-input {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .uuid-input::placeholder { color: #333; }
+        .uuid-input:focus { border-color: #333; }
+
+        .btn-go {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-go:hover { background: #1a1a1a; border-color: #333; }
+
+        .uuid-error {
+            font-size: 12px; color: #ff4757;
+            margin-top: 8px; display: none;
+        }
+
+        .footer {
+            margin-top: 48px;
+            font-size: 11px;
+            color: #2a2a2a;
+            font-family: 'Space Mono', monospace;
+        }
+        .footer a { color: #333; text-decoration: none; }
+        .footer a:hover { color: var(--green); }
+
+        .wave-decor {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 80px; z-index: 0; opacity: 0.1; overflow: hidden;
+        }
+        .wave-decor svg { width: 100%; height: 100%; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Spotify Control Panel</h1>
-        <a href="/login" class="button">Vincular Cuenta de Spotify</a>
-        <a href="/overlays" class="button">Overlays</a>
+
+    <div class="wave-decor">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path d="M0,40 C180,10 360,70 540,40 C720,10 900,70 1080,40 C1260,10 1350,60 1440,40 L1440,80 L0,80 Z"
+                  fill="#1DB954"/>
+        </svg>
     </div>
+
+    <div class="container">
+
+        <div class="icon-wrap">
+            <div class="icon-ring"></div>
+            <div class="icon-ring"></div>
+            <div class="icon-circle">
+                <div class="eq">
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                    <div class="eq-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <h1>Overlay de <span>Spotify</span><br>para tu stream</h1>
+
+        <p class="subtitle">
+            Conecta tu cuenta y obtén una URL personalizada para mostrar
+            la canción que estás escuchando en OBS o StreamElements.
+        </p>
+
+        <div class="features">
+            <div class="feature"><div class="feature-dot"></div> 8 estilos de overlay</div>
+            <div class="feature"><div class="feature-dot"></div> Colores dinámicos</div>
+            <div class="feature"><div class="feature-dot"></div> Sin configuración</div>
+        </div>
+
+        <!-- Botón principal -->
+        <a href="/login" class="btn-login">
+            <div class="btn-icon">♪</div>
+            Conectar con Spotify
+        </a>
+
+        <!-- Separador -->
+        <div class="divider">ya tengo mi ID</div>
+
+        <!-- Input UUID para volver a los overlays -->
+        <div class="uuid-section">
+            <div class="uuid-input-row">
+                <input
+                    class="uuid-input"
+                    id="uuidInput"
+                    type="text"
+                    placeholder="Pega tu ID aquí..."
+                    spellcheck="false"
+                    autocomplete="off"
+                />
+                <button class="btn-go" onclick="goToOverlays()">Ir →</button>
+            </div>
+            <div class="uuid-error" id="uuidError">ID inválido, revísalo e intenta de nuevo.</div>
+        </div>
+
+        <div class="footer">
+            Gratis · Sin anuncios · Código abierto
+            &nbsp;·&nbsp;
+            <a href="https://github.com/Lexs109/viewSpotify" target="_blank">GitHub</a>
+        </div>
+
+    </div>
+
+    <script>
+        // UUID v4 regex
+        const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+        function goToOverlays() {
+            const val = document.getElementById('uuidInput').value.trim();
+            const err = document.getElementById('uuidError');
+
+            if (!UUID_REGEX.test(val)) {
+                err.style.display = 'block';
+                return;
+            }
+            err.style.display = 'none';
+            window.location.href = `/u/${val}/overlays`;
+        }
+
+        // Permitir Enter en el input
+        document.getElementById('uuidInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') goToOverlays();
+        });
+    </script>
+
 </body>
 </html>

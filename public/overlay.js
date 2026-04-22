@@ -6,6 +6,12 @@ const CONFIG = {
     pauseAtEnd: 1.5,   // segundos de pausa antes de reiniciar
 };
 
+// ── Detecta si es ruta de usuario /u/:uuid/ o ruta legacy ─
+// Si la URL es /u/UUID/overlay/1 usa /u/UUID/song
+// Si la URL es /overlay/1 (legacy/local) usa /song
+const uuidMatch = window.location.pathname.match(/^\/u\/([^/]+)\//);
+const songEndpoint = uuidMatch ? `/u/${uuidMatch[1]}/song` : "/song";
+
 let lastSong = "";
 let hideTimeout = null;
 let localProgress = 0;
@@ -30,10 +36,8 @@ function applyMarquee(el, speedPxPerSec) {
     const textWidth = el.scrollWidth;
     const overflow = textWidth - containerWidth;
 
-    // Si cabe, no mueve
     if (overflow <= 0) return;
 
-    // Distancia total: texto entra desde la derecha y sale por la izquierda
     const totalDistance = containerWidth + textWidth;
     const scrollDuration = totalDistance / speedPxPerSec;
     const totalDuration = scrollDuration + CONFIG.pauseAtEnd;
@@ -47,7 +51,6 @@ function applyMarquee(el, speedPxPerSec) {
         document.head.appendChild(styleEl);
     }
 
-    // Empieza justo fuera a la derecha, termina justo fuera a la izquierda
     styleEl.textContent += `
         @keyframes ${animName} {
             0% { transform: translateX(${containerWidth}px); }
@@ -82,7 +85,7 @@ setInterval(() => {
 
 async function updateSong() {
     try {
-        const res = await fetch("/song");
+        const res = await fetch(songEndpoint);
         const data = await res.json();
 
         const player = document.getElementById("player");
@@ -119,16 +122,14 @@ async function updateSong() {
             const bgBlur = document.getElementById("bg-blur");
             if (bgBlur) bgBlur.style.backgroundImage = `url(${data.cover})`;
 
-            // Artista — sin truncar, el marquee lo maneja
             const artistEl = document.getElementById("artist");
             if (artistEl) {
-                artistEl.innerText = data.artist.split(",")[0].trim(); // ← sin cortar con ...
+                artistEl.innerText = data.artist.split(",")[0].trim();
                 artistEl.style.color = data.artistColor;
-                artistEl.style.whiteSpace = "nowrap"; // ← asegura que no haga wrap
+                artistEl.style.whiteSpace = "nowrap";
                 setTimeout(() => applyMarquee(artistEl, CONFIG.artistSpeed), 100);
             }
 
-            // Título con marquee
             const titleScroll = document.getElementById("title-scroll");
             if (titleScroll) {
                 titleScroll.innerText = data.title;
@@ -137,7 +138,6 @@ async function updateSong() {
                 setTimeout(() => applyMarquee(titleScroll, CONFIG.titleSpeed), 100);
             }
 
-            // Título simple
             const titleSimple = document.getElementById("title");
             if (titleSimple) {
                 titleSimple.innerText = data.title;
